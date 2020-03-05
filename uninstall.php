@@ -3,7 +3,8 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit();
 }
-
+/*
+@TODO idea for future use:
 function sliced_ff_delete_plugin() {
 	global $wpdb;
     
@@ -12,3 +13,4 @@ function sliced_ff_delete_plugin() {
 }
 
 sliced_ff_delete_plugin();
+*/

@@ -5,7 +5,7 @@
  * Plugin Name:       Sliced Invoices & Formidable Forms
  * Plugin URI:        https://slicedinvoices.com/extensions/formidable-forms
  * Description:       Create forms that allow users to submit a quote or estimate request. Requirements: The Sliced Invoices Plugin and Formidable Forms
- * Version:           1.0
+ * Version:           1.0.0
  * Author:            Sliced Invoices
  * Author URI:        https://slicedinvoices.com/
  * Text Domain:       sliced-invoices-formidable-forms
@@ -175,11 +175,12 @@ class Sliced_Invoices_FF_Load {
 /*
  * Get fields added under repeater field
  */
+add_action('wp_ajax_nopriv_sliced_ff_field_meta', 'sliced_ff_field_meta');
 add_action('wp_ajax_sliced_ff_field_meta', 'sliced_ff_field_meta');
 
 function sliced_ff_field_meta(){
     
-    $repeater      = SIFF()->sliced_ff_repeater_fields($_POST['id']);    
+    $repeater      = SIFF()->sliced_ff_repeater_fields( sanitize_text_field( $_POST['id'] ) );
     $fields        = array();
     $fields['qty'] = $fields['amt'] = $fields['title'] = $fields['desc'] = "<option value=''>--Choose Field--</option>";    
     foreach($repeater as $rep){                

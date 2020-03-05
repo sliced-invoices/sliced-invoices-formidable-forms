@@ -3,8 +3,8 @@ Contributors: SlicedInvoices
 Donate link: http://slicedinvoices.com/
 Tags: formidable forms, formidable forms add on, formidable invoice, formidable forms invoice, formidable forms estimate, formidable forms quote, invoice, invoicing, quotes, estimates, invoice clients, quote request, estimate request, formidable forms pro
 Requires at least: 4.0
-Tested up to: 5.2.3
-Stable tag: 1.0
+Tested up to: 5.4
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,5 +69,5 @@ You can also set up confirmations and notifications as per normal in the Formida
 4. Sliced Invoices settings is added to the Formidable Forms Pro settings & Mapping the fields on our form to our quote or invoice.
 
 == Changelog ==
-=1.0 =
+= 1.0.0 =
 * Initial release at WordPress.org

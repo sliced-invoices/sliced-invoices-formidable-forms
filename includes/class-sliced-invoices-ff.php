@@ -15,7 +15,18 @@ class Sliced_Invoices_FF {
 			self::$_siff_instance = new self();
 		}
 		return self::$_siff_instance;
-	} 
+	}
+	
+	public static function _issetarr( $array, $key, $default = null ) {
+		return isset( $array[$key] ) ? $array[$key] : $default;
+	}
+	
+	public static function _stripslashes_deep( $value ) {
+		$value = is_array( $value ) ?
+					array_map( array( 'Sliced_Invoices_FF', '_stripslashes_deep' ), $value ) :
+					stripslashes( $value );
+		return $value;
+	}
     
     public function sliced_ff_settings($sections){
         
@@ -31,14 +42,17 @@ class Sliced_Invoices_FF {
         return $sections;            
     }
     
-    public function sliced_ff_select($query, $row = true){
-        
-        global $wpdb;
-        if($row)
-            return $wpdb->get_row($query);
-        else
-            return $wpdb->get_results($query);
-    }
+	public function sliced_ff_select( $query, $args = array(), $row = true ) {
+		global $wpdb;
+		
+		$query = $wpdb->prepare( $query, $args );
+		
+		if ( $row ) {
+			return $wpdb->get_row($query);
+		} else {
+			return $wpdb->get_results($query);
+		}
+	}
     
     public function sliced_ff_update($table, $data, $where){
         
@@ -55,44 +69,70 @@ class Sliced_Invoices_FF {
     public function sliced_ff_if_main_form(){
         
         if(isset($_GET['id'])){
-            $form = $this->sliced_ff_form_details($_GET['id']);
+            $form = $this->sliced_ff_form_details( sanitize_text_field( $_GET['id'] ) );
             if(isset($form->parent_form_id) && $form->parent_form_id == 0)
                 return true;                
         }
         return false;         
     }
     
-    public function sliced_ff_form_details($Fid){
-        
-        return $this->sliced_ff_select("SELECT * FROM " . SIFF_FRM_FORMS . " WHERE id = " . $Fid);  
-    }    
-    
-    public function sliced_ff_form_fields(){
-        
-        //'text','email','textarea','number','rte','url','hidden' ['date',divider - pro]
-        return $this->sliced_ff_select("SELECT id,name,type FROM " . SIFF_FRM_FORM_FIELDS . " WHERE form_id = " . $_GET['id'] ." AND type IN ('text','email','textarea','number','rte','url','hidden','date','divider')",false);  
-    }
-    
-    public function sliced_ff_repeater_fields($id){
-        
-        $fields = array();
-        $form = $this->sliced_ff_select("SELECT * FROM ".SIFF_FRM_FORM_FIELDS." WHERE id = ".$id);        
-        if($form){        
-            if(is_object($form->field_options) || is_array($form->field_options)) $form_opt = $form->field_options;
-            else $form_opt = maybe_unserialize($form->field_options);
-            if(isset($form_opt['form_select'])){
-                $fields = $this->sliced_ff_select("SELECT id,name,type FROM ".SIFF_FRM_FORM_FIELDS." WHERE form_id = ".$form_opt['form_select'],false);
-            }        
-        }
-        return $fields;
-    }
-        
-    public function sliced_ff_settings_data($form_id = 0){
-        
-        return $this->sliced_ff_select("SELECT * FROM ".SIFF_SETTINGS_TABLE." WHERE form_id = ".($form_id == 0 ? $_GET['id'] : $form_id));  
-    }
-    
-    public function sliced_ff_setting_details(){
+	public function sliced_ff_form_details( $Fid ) {
+		return $this->sliced_ff_select(
+			"SELECT * FROM ".SIFF_FRM_FORMS." WHERE id = %s",
+			array(
+				$Fid,
+			)
+		);
+	}    
+	
+	public function sliced_ff_form_fields() {
+		//'text','email','textarea','number','rte','url','hidden' ['date',divider - pro]
+		return $this->sliced_ff_select(
+			"SELECT id,name,type FROM ".SIFF_FRM_FORM_FIELDS." WHERE form_id = %s AND type IN ('text','email','textarea','number','rte','url','hidden','date','divider')",
+			array(
+				sanitize_text_field( $_GET['id'] ),
+			),
+			false
+		);
+	}
+	
+	public function sliced_ff_repeater_fields( $id ) {
+		$fields = array();
+		$form = $this->sliced_ff_select(
+			"SELECT * FROM ".SIFF_FRM_FORM_FIELDS." WHERE id = %s",
+			array(
+				$id,
+			)
+		);
+		if ( $form ) {        
+			if ( is_object( $form->field_options ) || is_array( $form->field_options ) ) {
+				$form_opt = $form->field_options;
+			} else {
+				$form_opt = maybe_unserialize( $form->field_options );
+			}
+			if ( isset( $form_opt['form_select'] ) ) {
+				$fields = $this->sliced_ff_select(
+					"SELECT id,name,type FROM ".SIFF_FRM_FORM_FIELDS." WHERE form_id = %s",
+					array(
+						$form_opt['form_select'],
+					),
+					false
+				);
+			}
+		}
+		return $fields;
+	}
+	
+	public function sliced_ff_settings_data( $form_id = 0 ) {
+		return $this->sliced_ff_select(
+			"SELECT * FROM ".SIFF_SETTINGS_TABLE." WHERE form_id = %s",
+			array(
+				$form_id == 0 ? sanitize_text_field( $_GET['id'] ) : $form_id,
+			)
+		);
+	}
+
+    public static function sliced_ff_setting_details(){
         
         $siff_field = $siff_values = array();
         $siff_form_fields = SIFF()->sliced_ff_form_fields();        
@@ -192,26 +232,29 @@ class Sliced_Invoices_FF {
             
             global $formidablePro;
             $values      = (array) $if_siff_set;
-            $post        = $_POST['item_meta'];
-            $post_type   = $values['type'];                    
+			$post        = $this->_stripslashes_deep( $_POST['item_meta'] ); // values of $post will be sanitized below:
+            $post_type   = $values['type'];
             $line_itemID = 0;                                    
                                     
-            $name          = stripslashes(( isset($post[$values['name']]) && $post[$values['name']] != "" ? $post[$values['name']] : "" ));
-            $email         = stripslashes(( isset($post[$values['email']]) && $post[$values['email']] != "" ? $post[$values['email']] : "" ));
-            $extra_info    = stripslashes(( isset($post[$values['extra_info']]) && $post[$values['extra_info']] != "" ? $post[$values['extra_info']] : ""));
-            $website       = stripslashes(( isset($post[$values['website']]) && $post[$values['website']] != "" ? $post[$values['website']] : "" ));		
-            $title         = stripslashes(( isset($post[$values['title']]) && $post[$values['title']] != "" ? $post[$values['title']] : "" ));
-            $description   = stripslashes(( isset($post[$values['description']]) && $post[$values['description']] != "" ?$post[$values['description']]:""));
-            $terms         = stripslashes(( isset($post[$values['terms']]) && $post[$values['terms']] != "" ? $post[$values['terms']] : "" ));
-            $tax_rate      = stripslashes(( isset($post[$values['tax_rate']]) && $post[$values['tax_rate']] != "" ? $post[$values['tax_rate']] : 0 ));
-            $business_name = stripslashes(( isset($post[$values['business_name']]) && $post[$values['business_name']] != "" ? $post[$values['business_name']] : "" ));
-            $address       = stripslashes(( isset($post[$values['business_address']]) && $post[$values['business_address']] != "" ? $post[$values['business_address']] : "" ));                
+            $name          = sanitize_text_field( $this->_issetarr( $post, $values['name'], '' ) );
+            $email         = sanitize_email( $this->_issetarr( $post, $values['email'], '' ) );
+            $extra_info    = sanitize_text_field( $this->_issetarr( $post, $values['extra_info'], '' ) );
+            $website       = sanitize_text_field( $this->_issetarr( $post, $values['website'], '' ) );
+            $title         = sanitize_text_field( $this->_issetarr( $post, $values['title'], '' ) );
+            $description   = sanitize_text_field( $this->_issetarr( $post, $values['description'], '' ) );
+            $terms         = sanitize_text_field( $this->_issetarr( $post, $values['terms'], '' ) );
+            $tax_rate      = sanitize_text_field( $this->_issetarr( $post, $values['tax_rate'], '' ) );
+            $business_name = sanitize_text_field( $this->_issetarr( $post, $values['business_name'], '' ) );
+            $address       = sanitize_text_field( $this->_issetarr( $post, $values['business_address'], '' ) );
                 
             if($formidablePro){
-                $date        = ( isset($post[$values['date']]) && $post[$values['date']] != "" ? strtotime($post[$values['date']]) : "" );
+                $date        = sanitize_text_field( $this->_issetarr( $post, $values['date'], '' ) );
+				if ( $date ) {
+					$date = strtotime( $date );
+				}
                 $line_itemID = $values['line_item'];
             }
-            
+			
             if($email != "" && $title != ""){
                 
                 $status         = $values['status'];
@@ -221,7 +264,7 @@ class Sliced_Invoices_FF {
                 if($post_type === 'invoice'){
                     $prefix = sliced_get_invoice_prefix();
                     $suffix = sliced_get_invoice_suffix();
-            		$order_number = stripslashes(( isset($post[$values['order_number']]) && $post[$values['order_number']] != "" ? $post[$values['order_number']] : "" ));
+            		$order_number = sanitize_text_field( $this->_issetarr( $post, $values['order_number'], '' ) );
                     $number = sliced_get_next_invoice_number();
                         
                 }else if($post_type === 'quote'){ 
@@ -304,10 +347,10 @@ class Sliced_Invoices_FF {
                     $line_items = $si_lineItem = array(); $l = 0;
                     if(is_array($line_meta) && isset($line_meta[0]['qty'])){
                         foreach($line_meta as $li){
-                            if(isset($post[$li['title']])) $line_items[$l]['title'] = $post[$li['title']];
-                            if(isset($post[$li['desc']])) $line_items[$l]['description'] = $post[$li['desc']];
-                            if(isset($post[$li['qty']]) && is_numeric($post[$li['qty']])) $line_items[$l]['qty'] = $post[$li['qty']];
-                            if(isset($post[$li['amt']]) && is_numeric($post[$li['amt']])) $line_items[$l]['amount'] = $post[$li['amt']];
+                            if(isset($post[$li['title']])) $line_items[$l]['title'] = sanitize_text_field( $post[$li['title']] );
+                            if(isset($post[$li['desc']])) $line_items[$l]['description'] = sanitize_textarea_field( $post[$li['desc']] );
+                            if(isset($post[$li['qty']]) && is_numeric($post[$li['qty']])) $line_items[$l]['qty'] = sanitize_text_field( $post[$li['qty']] );
+                            if(isset($post[$li['amt']]) && is_numeric($post[$li['amt']])) $line_items[$l]['amount'] = sanitize_text_field( $post[$li['amt']] );
                             if(isset($line_items[$l]))$line_items[$l]['taxable'] = 'on';
                             $l++;
                         }                                         
@@ -316,16 +359,16 @@ class Sliced_Invoices_FF {
                     }                    
                 }
                 else{
-                    $lineItem   = $post[$line_itemID];
+                    $lineItem   = $post[$line_itemID]; // this is an array... will sanitize individual values below:
                     $line_meta  = maybe_unserialize($values['line_item_meta']);
                     $line_items = array();           
                     if(is_array($line_meta)){                        
                         foreach($lineItem['row_ids'] as $item){
                             foreach($lineItem[$item] as $id => $val){                                
-                                if(isset($line_meta['title']) && $line_meta['title'] == $id) $line_items[$item]['title'] = stripslashes($val);
-                                else if(isset($line_meta['desc']) && $line_meta['desc'] == $id) $line_items[$item]['description'] = stripslashes($val);
-                                else if(isset($line_meta['qty']) && $line_meta['qty'] == $id) $line_items[$item]['qty'] = (is_numeric($val) ? $val : 0);
-                                else if(isset($line_meta['amt']) && $line_meta['amt'] == $id) $line_items[$item]['amount'] = (is_numeric($val) ? $val : 0);
+                                if(isset($line_meta['title']) && $line_meta['title'] == $id) $line_items[$item]['title'] = sanitize_text_field($val);
+                                else if(isset($line_meta['desc']) && $line_meta['desc'] == $id) $line_items[$item]['description'] = sanitize_text_field($val);
+                                else if(isset($line_meta['qty']) && $line_meta['qty'] == $id) $line_items[$item]['qty'] = (is_numeric($val) ? sanitize_text_field( $val ) : 0);
+                                else if(isset($line_meta['amt']) && $line_meta['amt'] == $id) $line_items[$item]['amount'] = (is_numeric($val) ? sanitize_text_field( $val ) : 0);
                             }
                             if(isset($line_items[$item]))$line_items[$item]['taxable'] = 'on';
                         }                        
