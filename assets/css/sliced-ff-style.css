@@ -1,0 +1,101 @@
+/**
+ * Sliced Invoices & Formidable Forms
+ * Author: Sliced Invoices
+ * Version: 1.0
+ * License: Licensed under the AGPL license.
+*/
+
+.siff-required {
+    color: red;
+    font-weight: bold;
+    font-size: 15px;
+    position: relative;
+    top: -4px;
+    right: -6px;
+}
+.siff-none{ display: none; }
+.sliced-ff-main th{font-weight: normal;}
+.sliced-ff-main .line-items td{vertical-align: middle;}
+.sliced-ff-main select + i{font-size: 12px;position: relative;top:5px}
+/** toggle */
+.sliced-ff-main .switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+.sliced-ff-main .switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.sliced-ff-main .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+.sliced-ff-main .slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+.sliced-ff-main input:checked + .slider {
+  background-color: #2196F3;
+}
+.sliced-ff-main input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+.sliced-ff-main input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+.sliced-ff-main .slider.round {
+  border-radius: 34px;
+}
+.sliced-ff-main .slider.round:before {
+  border-radius: 50%;
+}
+/** End toggle */
+.sliced-ff-main select{
+    max-width: 250px;
+}
+.sliced-ff-main a.sliced_ff_submit{
+    margin: 0;
+    padding: 7px 10px;
+    width: 150px;
+    font-size: 18px;    
+    display: block;
+    text-align: center;    
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius);
+}
+.sliced-ff-main a.sliced_ff_submit:hover{
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+}
+.sliced-ff-main .line-items table{
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 12px;
+}
+.sliced-ff-main a#si-line-add, .sliced-ff-main a.si-line-remove{
+    border: 1px solid var(--primary-color);
+    border-radius: 30px;
+    font-size: 1em;
+    padding: 5px 15px;
+    margin-top: 10px;
+    display: inline-block;
+}
