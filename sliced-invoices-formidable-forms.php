@@ -88,12 +88,12 @@ function sliced_ff_validate_settings() {
     
     $sliced = $formi = 1;
 	if ( ! class_exists( 'Sliced_Invoices' ) ) {
-		add_action( 'all_admin_notices', 'sliced_ff_requirements_not_met_notice_sliced' );
+		add_action( 'admin_notices', 'sliced_ff_requirements_not_met_notice_sliced' );
         $sliced = 0;
 	}
 	
 	if ( ! class_exists( 'FrmHooksController' ) ) {
-		add_action( 'all_admin_notices', 'sliced_ff_requirements_not_met_notice_ff' );
+		add_action( 'admin_notices', 'sliced_ff_requirements_not_met_notice_ff' );
         $formi = 0;
 	}
     
