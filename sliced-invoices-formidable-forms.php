@@ -5,10 +5,13 @@
  * Plugin Name:       Sliced Invoices & Formidable Forms
  * Plugin URI:        https://slicedinvoices.com/extensions/formidable-forms
  * Description:       Create forms that allow users to submit a quote or estimate request. Requirements: The Sliced Invoices Plugin and Formidable Forms
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Sliced Invoices
  * Author URI:        https://slicedinvoices.com/
  * Text Domain:       sliced-invoices-formidable-forms
+ * Copyright:         © 2021 Sliced Software, LLC. All rights reserved.
+ * License:           GNU General Public License v3.0
+ * License URI:       http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 // Exit if accessed directly
@@ -83,6 +86,9 @@ function sliced_ff_requirements_not_met_notice_ff() {
 
 /*
  * Active Sliced Invoices Settings For Formidable
+ *
+ * @version 1.0.1
+ * @since   1.0.0
  */
 function sliced_ff_validate_settings() {
     
