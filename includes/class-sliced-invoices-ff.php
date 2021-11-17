@@ -348,7 +348,7 @@ class Sliced_Invoices_FF {
                     if(is_array($line_meta) && isset($line_meta[0]['qty'])){
                         foreach($line_meta as $li){
                             if(isset($post[$li['title']])) $line_items[$l]['title'] = sanitize_text_field( $post[$li['title']] );
-                            if(isset($post[$li['desc']])) $line_items[$l]['description'] = sanitize_textarea_field( $post[$li['desc']] );
+                            if(isset($post[$li['desc']])) $line_items[$l]['description'] = wp_kses( $post[$li['desc']], 'post' );
                             if(isset($post[$li['qty']]) && is_numeric($post[$li['qty']])) $line_items[$l]['qty'] = sanitize_text_field( $post[$li['qty']] );
                             if(isset($post[$li['amt']]) && is_numeric($post[$li['amt']])) $line_items[$l]['amount'] = sanitize_text_field( $post[$li['amt']] );
                             if(isset($line_items[$l]))$line_items[$l]['taxable'] = 'on';
@@ -366,7 +366,7 @@ class Sliced_Invoices_FF {
                         foreach($lineItem['row_ids'] as $item){
                             foreach($lineItem[$item] as $id => $val){                                
                                 if(isset($line_meta['title']) && $line_meta['title'] == $id) $line_items[$item]['title'] = sanitize_text_field($val);
-                                else if(isset($line_meta['desc']) && $line_meta['desc'] == $id) $line_items[$item]['description'] = sanitize_text_field($val);
+                                else if(isset($line_meta['desc']) && $line_meta['desc'] == $id) $line_items[$item]['description'] = wp_kses( $val, 'post' );
                                 else if(isset($line_meta['qty']) && $line_meta['qty'] == $id) $line_items[$item]['qty'] = (is_numeric($val) ? sanitize_text_field( $val ) : 0);
                                 else if(isset($line_meta['amt']) && $line_meta['amt'] == $id) $line_items[$item]['amount'] = (is_numeric($val) ? sanitize_text_field( $val ) : 0);
                             }
