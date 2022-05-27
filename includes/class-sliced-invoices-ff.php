@@ -225,6 +225,12 @@ class Sliced_Invoices_FF {
         do_action( 'sliced_invoices_formidable_saved_settings', $form_id, $details );
     }        
     
+	/*
+	 * sliced_ff_create.
+	 * 
+	 * @version 1.0.2
+	 * @since   1.0.0
+	 */
     public function sliced_ff_create($params){
         
         $if_siff_set = SIFF()->sliced_ff_settings_data($params['form_id']);

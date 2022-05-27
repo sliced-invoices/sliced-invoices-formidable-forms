@@ -3,10 +3,10 @@ Contributors: SlicedInvoices
 Donate link: http://slicedinvoices.com/
 Tags: formidable forms, formidable forms add on, formidable invoice, formidable forms invoice, formidable forms estimate, formidable forms quote, invoice, invoicing, quotes, estimates, invoice clients, quote request, estimate request, formidable forms pro
 Requires at least: 4.0
-Tested up to: 5.7
-Stable tag: 1.0.1
-License: GNU General Public License v3.0
-License URI: http://www.gnu.org/licenses/gpl-3.0.html
+Tested up to: 6.0
+Stable tag: 1.0.2
+License: GPLv2
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Create an invoice or quote request form using Formidable Forms Or Formidable Forms Pro. Each form entry then creates a quote (or an invoice) using the Sliced Invoices plugin.
 
@@ -61,6 +61,19 @@ You can also set up confirmations and notifications as per normal in the Formida
 1. Activate the plugin through the 'Plugins' menu in WordPress
 
 
+== Frequently Asked Questions ==
+
+= Minimum System Requirements =
+
+* WordPress 4.0 or newer
+* Formidable Forms 4.10 or newer
+* Sliced Invoices 3.7 or newer
+* PHP version from 5.5 up to 8.0
+
+= Where can I get help? =
+
+For all support issues please [open a Support Ticket on our website](https://slicedinvoices.com/support-ticket/).
+
 
 == Screenshots ==
 1. Creating the form using Formidable Forms Builder.
@@ -69,6 +82,11 @@ You can also set up confirmations and notifications as per normal in the Formida
 4. Sliced Invoices settings is added to the Formidable Forms Pro settings & Mapping the fields on our form to our quote or invoice.
 
 == Changelog ==
+= 1.0.2 =
+* UPDATE: changes for compatibility with forthcoming Sliced Invoices v3.9.0.
+* UPDATE: PHP 8.0 compatibility.
+* FIX: allow HTML tags in line item description field.
+
 = 1.0.1 =
 * FIX: display issue with admin notices.
 
